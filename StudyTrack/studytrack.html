@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Study Log</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <link rel="stylesheet" href="studytrack.css">
+
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <header class="header">
+            <h1>Rei's Study Log</h1>
+            <div class="date-display" id="currentDate"></div>
+        </header>
+
+        <nav class="subject-grid" id="subjectGrid">
+        </nav>
+
+        <main class="dashboard-grid">
+
+            <div class="grid-col-left">
+                <section class="ios-section">
+                    <div class="section-header">SESSION TIMER</div>
+                    <div class="ios-card timer-card">
+                        <div class="timer-display" id="timerDisplay">00:00:00</div>
+                        <div class="timer-controls">
+                            <button id="btnStart" class="ios-btn btn-primary">Start</button>
+                            <button id="btnPause" class="ios-btn btn-secondary" disabled>Pause</button>
+                            <button id="btnEnd" class="ios-btn btn-destructive" disabled>End</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="grid-col-right">
+                <section class="ios-section">
+                    <div class="section-header">CHECKLIST</div>
+                    <div class="ios-card task-card-container" id="taskList">
+                    </div>
+                </section>
+            </div>
+
+            <div class="grid-col-full">
+                <section class="ios-section">
+                    <div class="section-header header-flex">
+                        <span>HISTORY</span>
+                        <button id="btnClearHistory" class="text-btn">Clear All</button>
+                    </div>
+                    <div id="historyList">
+                        <div class="empty-state">No sessions recorded yet.</div>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <dialog id="pauseModal" class="ios-modal">
+        <div class="modal-content">
+            <h3>Pause Session</h3>
+            <p>Please specify a reason.</p>
+            <input type="text" id="pauseInput" placeholder="e.g., Lunch, Break" autocomplete="off">
+            <div class="modal-actions">
+                <button id="btnConfirmPause" disabled>Pause</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="studytrack.js"></script>
+</body>
+
+</html>

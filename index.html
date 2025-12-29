@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOS Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="desktop-wallpaper"></div>
+
+    <main class="finder-window">
+        <header class="window-header">
+            <div class="window-controls">
+                <span class="control close"></span>
+                <span class="control minimize"></span>
+                <span class="control maximize"></span>
+            </div>
+            <div class="breadcrumbs" id="breadcrumbs">
+                <span class="crumb active" id="root-crumb">LifeOS</span>
+            </div>
+            <div class="window-actions">
+                <button id="btn-new-folder" class="header-btn">＋ New Folder</button>
+                <label for="file-upload" class="header-btn">↑ Upload</label>
+                <input type="file" id="file-upload" hidden multiple>
+            </div>
+        </header>
+
+        <div class="window-body">
+            <aside class="sidebar">
+                <nav>
+                    <ul id="sidebar-nav">
+                        <li class="active" data-view="lifeos">LifeOS</li>
+                        <li data-view="documents">Documents</li>
+                        <li data-view="pictures">Pictures</li>
+                        <li data-view="music">Music</li>
+                        <li data-view="videos">Videos</li>
+                        <li data-view="desktop">Desktop</li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <section class="content-area">
+                <div class="file-grid" id="file-grid"></div>
+            </section>
+        </div>
+    </main>
+
+    <div class="photo-viewer" id="photo-viewer">
+        <button class="viewer-close">Done</button>
+        <img id="viewer-img" src="" alt="Preview">
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="action-sheet" id="action-sheet">
+            <div class="action-group">
+                <button class="action-item" id="action-rename">Rename</button>
+                <button class="action-item destructive" id="action-delete">Delete</button>
+            </div>
+            <div class="action-group">
+                <button class="action-item cancel" id="action-cancel">Cancel</button>
+            </div>
+        </div>
+
+        <div class="ios-alert" id="ios-alert">
+            <div class="alert-content">
+                <h3 id="alert-title">New Folder</h3>
+                <p id="alert-msg">Enter a name.</p>
+                <input type="text" id="alert-input" class="ios-input">
+            </div>
+            <div class="alert-buttons">
+                <button class="alert-btn" id="alert-cancel">Cancel</button>
+                <button class="alert-btn primary" id="alert-confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
