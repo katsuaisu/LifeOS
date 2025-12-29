@@ -7,12 +7,12 @@
     --grid-line: rgba(0, 0, 0, 0.04);
     --separator: rgba(0, 0, 0, 0.08);
 
-    --p-red: hsla(350, 100%, 92%, 1);
-    --p-orange: hsla(30, 100%, 90%, 1);
-    --p-yellow: hsla(50, 100%, 88%, 1);
-    --p-green: hsla(140, 60%, 88%, 1);
-    --p-blue: hsla(210, 100%, 91%, 1);
-    --p-purple: hsla(260, 100%, 92%, 1);
+    --p-red: #fde7e9;
+    --p-orange: #fff1e0;
+    --p-yellow: #fef9e3;
+    --p-green: #eaf6ed;
+    --p-blue: #e8f4fe;
+    --p-purple: #f3f0fd;
     --p-gray: #f2f2f7;
 
     --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
@@ -67,7 +67,7 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    width: 200px;
+    width: 250px;
 }
 
 .toolbar-right {
@@ -271,8 +271,8 @@ body {
 }
 
 .day-header.today .day-number {
-    background: var(--p-red);
-    color: #d63a49;
+    background: #ff3b3020;
+    color: #ff3b30;
     font-weight: 700;
 }
 
@@ -285,7 +285,7 @@ body {
     font-size: 12px;
     cursor: pointer;
     overflow: hidden;
-    border-left: 3px solid rgba(0, 0, 0, 0.1);
+    border-left: 3px solid rgba(0, 0, 0, 0.05);
     background: var(--p-blue);
     transition: transform 0.1s, box-shadow 0.1s;
 }
@@ -299,13 +299,13 @@ body {
 .event-chip strong {
     display: block;
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.75);
+    color: #1d1d1f;
     margin-bottom: 2px;
 }
 
 .event-chip span {
     display: block;
-    color: rgba(0, 0, 0, 0.5);
+    color: #86868b;
     font-size: 11px;
 }
 
@@ -375,7 +375,6 @@ body {
     align-items: center;
     gap: 10px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-    cursor: grab;
 }
 
 .task-check {
@@ -388,6 +387,15 @@ body {
 
 .task-check:hover {
     border-color: var(--accent);
+}
+
+.schedule-task-btn {
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 20px;
 }
 
 .sidebar-footer {
@@ -479,7 +487,8 @@ body {
     border-bottom: none;
 }
 
-input[type="time"] {
+input[type="time"],
+input[type="date"] {
     border: none;
     background: #efeff4;
     padding: 6px;

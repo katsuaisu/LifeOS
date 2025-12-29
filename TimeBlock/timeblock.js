@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
         endHour: 24,
         hourHeight: 60,
         colors: {
-            red: 'hsla(350, 100%, 92%, 1)',
-            orange: 'hsla(30, 100%, 90%, 1)',
-            yellow: 'hsla(50, 100%, 88%, 1)',
-            green: 'hsla(140, 60%, 88%, 1)',
-            blue: 'hsla(210, 100%, 91%, 1)',
-            purple: 'hsla(260, 100%, 92%, 1)',
+            red: '#fde7e9',
+            orange: '#fff1e0',
+            yellow: '#fef9e3',
+            green: '#eaf6ed',
+            blue: '#e8f4fe',
+            purple: '#f3f0fd',
             gray: '#f2f2f7'
         }
     };
@@ -75,16 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const stored = localStorage.getItem('9strontium_events');
         if (stored) {
             state.events = JSON.parse(stored);
-
-            // --- MIGRATION FIX ---
-            // Tag existing school events so the toggle works immediately for old data
             state.events.forEach(ev => {
                 if (ev.isSchool === undefined) {
                     const isDefault = STRONTIUM_SCHEDULE.some(def => def.t === ev.title);
                     if (isDefault) ev.isSchool = true;
                 }
             });
-            // ---------------------
         } else {
             resetToDefaults();
         }
@@ -168,8 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             col.setAttribute('data-date', dateKey);
-            col.addEventListener('dragover', e => e.preventDefault());
-            col.addEventListener('drop', handleDrop);
 
             const header = document.createElement('div');
             header.className = `day-header ${isToday ? 'today' : ''}`;
@@ -196,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dayEvents = state.events.filter(e => {
                 if (e.isSchool && !state.showSchool) return false;
-
                 const eventDate = new Date(e.date);
                 if (e.date === dateKey) return true;
                 if (e.repeat && eventDate.getDay() === dayOfWeek) return true;
@@ -216,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 chip.style.backgroundColor = ev.color;
 
                 const repeatIcon = ev.repeat ? ' ↻' : '';
-
                 chip.innerHTML = `<strong>${ev.title}${repeatIcon}</strong><span>${ev.location} ${ev.start}-${ev.end}</span>`;
                 chip.onclick = (e) => { e.stopPropagation(); openEditSheet(ev); };
 
@@ -233,18 +225,18 @@ document.addEventListener('DOMContentLoaded', () => {
         state.tasks.forEach(t => {
             const div = document.createElement('div');
             div.className = 'task-item';
-            div.draggable = true;
-            div.innerHTML = `<div class="task-check" onclick="finishTask('${t.id}')"></div><div>${t.text}</div>`;
-            div.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', JSON.stringify(t));
-            });
+            div.innerHTML = `
+                <div class="task-check" onclick="finishTask('${t.id}')"></div>
+                <div>${t.text}</div>
+                <button class="schedule-task-btn" onclick="scheduleTaskPrompt('${t.id}')">+</button>
+            `;
             list.appendChild(div);
         });
     }
 
     function setupInteractions() {
-        document.getElementById('next-period').onclick = () => changeDate(state.view === 'week' ? 7 : 1);
-        document.getElementById('prev-period').onclick = () => changeDate(state.view === 'week' ? -7 : -1);
+        document.getElementById('next-period').onclick = () => changeDate(7);
+        document.getElementById('prev-period').onclick = () => changeDate(-7);
         document.getElementById('today-btn').onclick = () => { state.currentDate = new Date(); renderCalendar(); updateDateHeader(); };
 
         document.getElementById('reset-defaults').onclick = () => {
@@ -266,24 +258,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.segment-opt').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 state.view = e.target.dataset.view;
-
                 const pill = document.querySelector('.segment-pill');
                 pill.style.width = e.target.offsetWidth + 'px';
                 pill.style.transform = `translateX(${e.target.offsetLeft}px)`;
-
                 renderCalendar();
             };
         });
 
         setTimeout(() => document.querySelector('.segment-opt.active').click(), 50);
-
         document.getElementById('toggle-tasks').onclick = () => document.getElementById('task-sidebar').classList.toggle('collapsed');
         document.getElementById('close-tasks').onclick = () => document.getElementById('task-sidebar').classList.add('collapsed');
 
         document.getElementById('add-task-btn').onclick = () => {
             const input = document.getElementById('new-task-input');
             if (input.value) {
-                state.tasks.push({ id: Date.now(), text: input.value });
+                state.tasks.push({ id: Date.now().toString(), text: input.value });
                 input.value = '';
                 saveTasks();
                 renderTasks();
@@ -295,13 +284,35 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('delete-event').onclick = deleteEvent;
     }
 
+    window.scheduleTaskPrompt = (id) => {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return;
+
+        const newEv = {
+            id: Date.now(),
+            title: task.text,
+            location: '',
+            start: "16:30",
+            end: "17:30",
+            color: CONFIG.colors.blue,
+            date: state.currentDate.toISOString().split('T')[0],
+            repeat: false,
+            isSchool: false
+        };
+
+        state.events.push(newEv);
+        state.tasks = state.tasks.filter(t => t.id !== id);
+        saveEvents();
+        saveTasks();
+        renderCalendar();
+        renderTasks();
+        openEditSheet(newEv);
+    };
+
     function updateToggleButton() {
         const btn = document.getElementById('toggle-school');
-        if (state.showSchool) {
-            btn.classList.remove('dimmed');
-        } else {
-            btn.classList.add('dimmed');
-        }
+        if (state.showSchool) btn.classList.remove('dimmed');
+        else btn.classList.add('dimmed');
     }
 
     function changeDate(days) {
@@ -324,6 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('event-end').value = ev.end;
         document.getElementById('event-repeat').checked = ev.repeat || false;
 
+        const dateInput = document.getElementById('event-date');
+        if (dateInput) dateInput.value = ev.date;
+
         const picker = document.getElementById('color-picker');
         picker.innerHTML = '';
         Object.values(CONFIG.colors).forEach(c => {
@@ -333,9 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dot.onclick = () => {
                 document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
                 dot.classList.add('selected');
-                dot.dataset.color = c;
             };
-            if (c === ev.color) dot.dataset.color = c;
             picker.appendChild(dot);
         });
 
@@ -348,13 +360,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = document.getElementById('event-start').value;
         const e = document.getElementById('event-end').value;
         const repeat = document.getElementById('event-repeat').checked;
+        const date = document.getElementById('event-date').value;
         const selectedDot = document.querySelector('.color-dot.selected');
         const color = selectedDot ? selectedDot.style.backgroundColor : CONFIG.colors.blue;
 
         const idx = state.events.findIndex(x => x.id === state.editingEventId);
         if (idx !== -1) {
             const isSchool = state.events[idx].isSchool || false;
-            state.events[idx] = { ...state.events[idx], title, location: loc, start: s, end: e, color, repeat, isSchool };
+            state.events[idx] = { ...state.events[idx], title, location: loc, start: s, end: e, color, repeat, isSchool, date };
             saveEvents();
             renderCalendar();
             document.getElementById('event-sheet-backdrop').classList.add('hidden');
@@ -366,41 +379,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveEvents();
         renderCalendar();
         document.getElementById('event-sheet-backdrop').classList.add('hidden');
-    }
-
-    function handleDrop(e) {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('text/plain');
-        if (!data) return;
-        const task = JSON.parse(data);
-
-        const col = e.currentTarget;
-        const gridRect = document.getElementById('grid-canvas').getBoundingClientRect();
-        const relY = e.clientY - gridRect.top - 50;
-
-        const hourIndex = Math.floor(relY / CONFIG.hourHeight);
-        let startH = CONFIG.startHour + hourIndex;
-        if (startH < CONFIG.startHour) startH = CONFIG.startHour;
-        if (startH >= CONFIG.endHour) startH = CONFIG.endHour - 1;
-
-        const newEv = {
-            id: Date.now(),
-            title: task.text,
-            location: '',
-            start: `${startH.toString().padStart(2, '0')}:00`,
-            end: `${(startH + 1).toString().padStart(2, '0')}:00`,
-            color: CONFIG.colors.blue,
-            date: col.dataset.date,
-            repeat: false,
-            isSchool: false
-        };
-
-        state.events.push(newEv);
-        state.tasks = state.tasks.filter(t => t.id !== task.id);
-        saveEvents();
-        saveTasks();
-        renderCalendar();
-        renderTasks();
     }
 
     window.finishTask = (id) => {
