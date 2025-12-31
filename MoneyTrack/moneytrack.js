@@ -7,6 +7,7 @@ const defaultState = {
         { name: 'GCash', balance: 0, currency: 'PHP' },
         { name: 'School Ipon', balance: 0, currency: 'PHP' },
         { name: 'Main Ipon', balance: 0, currency: 'PHP' },
+        { name: 'Stipend', balance: 0, currency: 'PHP' },
         { name: 'USD Wallet', balance: 0, currency: 'USD' }
     ],
     transactions: [],
@@ -34,8 +35,17 @@ function saveToLocal() {
 function loadFromLocal() {
     const saved = localStorage.getItem('financeDashboardState');
     if (saved) {
-        state = JSON.parse(saved);
+        const loadedState = JSON.parse(saved);
 
+
+        defaultState.wallets.forEach(defaultWallet => {
+            const exists = loadedState.wallets.some(w => w.name === defaultWallet.name);
+            if (!exists) {
+                loadedState.wallets.splice(state.wallets.length - 1, 0, defaultWallet);
+            }
+        });
+
+        state = loadedState;
         toggle.checked = state.useConversion;
     }
 }
